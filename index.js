@@ -21,7 +21,8 @@ async function run() {
     const categoriesCollection = client
       .db("ResaleZone")
       .collection("categories");
-    // all categories
+    const productsCollection = client.db("ResaleZone").collection("products");
+    // get all categories
     app.get("/categories", async (req, res) => {
       const query = {};
       const cursor = categoriesCollection.find(query);
@@ -29,6 +30,17 @@ async function run() {
 
       res.send(categories);
     });
+    // all products under a category
+    app.get("/categories/:category_id", async (req, res) => {
+      const id = req?.params?.category_id;
+      console.log(typeof id);
+      const query = { category_id: id };
+      const cursor = productsCollection.find(query);
+      const products = await cursor.toArray();
+      res.send(products);
+      console.log(products.length);
+    });
+    //
   } finally {
   }
 }
