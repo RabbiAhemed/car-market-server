@@ -24,6 +24,7 @@ async function run() {
       .collection("categories");
     const productsCollection = client.db("ResaleZone").collection("products");
     const usersCollection = client.db("ResaleZone").collection("users");
+    const bookingsCollection = client.db("ResaleZone").collection("bookings");
 
     // generate jwt and save users email
     app.put("/user/:email", async (req, res) => {
@@ -62,6 +63,14 @@ async function run() {
       const products = await cursor.toArray();
       res.send(products);
     });
+
+    // add a booking
+    app.post("/booking", async (req, res) => {
+      const newBooking = req?.body;
+      const result = await bookingsCollection.insertOne(newBooking);
+      res.send(result);
+    });
+
     //
   } finally {
   }
