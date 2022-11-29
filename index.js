@@ -65,10 +65,18 @@ async function run() {
     });
 
     // add a booking
-    app.post("/booking", async (req, res) => {
+    app.post("/bookings", async (req, res) => {
       const newBooking = req?.body;
       const result = await bookingsCollection.insertOne(newBooking);
       res.send(result);
+    });
+
+    // display my bookings / orders
+    app.get("/bookings", async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const myBookings = await bookingsCollection.find(query).toArray();
+      return res.send(myBookings);
     });
 
     //
