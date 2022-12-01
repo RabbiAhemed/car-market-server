@@ -129,6 +129,7 @@ async function run() {
       const articles = await cursor.toArray();
       res.send(articles);
     });
+
     // single article data
     app.get("/articles/:id", async (req, res) => {
       const id = req?.params?.id;
