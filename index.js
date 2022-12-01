@@ -41,6 +41,7 @@ async function run() {
     const productsCollection = client.db("ResaleZone").collection("products");
     const usersCollection = client.db("ResaleZone").collection("users");
     const bookingsCollection = client.db("ResaleZone").collection("bookings");
+    const articlesCollection = client.db("ResaleZone").collection("articles");
 
     // generate jwt and save users email
     // app.put("/user/:email", async (req, res) => {
@@ -121,6 +122,21 @@ async function run() {
     });
 
     //
+    // all articles data
+    app.get("/articles", async (req, res) => {
+      const query = {};
+      const cursor = articlesCollection.find(query);
+      const articles = await cursor.toArray();
+      res.send(articles);
+    });
+    // single article data
+    app.get("/articles/:id", async (req, res) => {
+      const id = req?.params?.id;
+      const query = { _id: ObjectId(id) };
+      const article = await articlesCollection.findOne(query);
+
+      res.send(article);
+    });
   } finally {
   }
 }
