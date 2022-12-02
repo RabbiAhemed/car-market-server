@@ -85,7 +85,13 @@ async function run() {
       const newUser = await usersCollection.insertOne(newUserData);
       res.send(newUser);
     });
-
+    // get all users
+    app.get("/users", async (req, res) => {
+      const query = {};
+      const cursor = usersCollection.find(query);
+      const allUsers = await cursor.toArray();
+      res.send(allUsers);
+    });
     // get all categories
     app.get("/categories", async (req, res) => {
       const query = {};
@@ -140,18 +146,47 @@ async function run() {
       const article = await articlesCollection.findOne(query);
       res.send(article);
     });
-    // get reported items
-    app.get("/reports", async (req, res) => {
-      const query = {};
-      const cursor = reportedItemsCollection.find(query);
-      const reportedItems = await cursor.toArray();
-      res.send(reportedItems);
+    // check if the user is admin or not
+    app.get("/users/admin/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email };
+      const user = await usersCollection.findOne(query);
+      res.send({ isAdmin: user?.userRole === "admin" });
+    });
+    // check if the user is seller or not
+    app.get("/users/seller/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email };
+      const user = await usersCollection.findOne(query);
+      res.send({ isSeller: user?.userRole === "seller" });
+    });
+    // check if the user is buyer or not
+    app.get("/users/buyer/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email };
+      const user = await usersCollection.findOne(query);
+      res.send({ isBuyer: user?.userRole === "buyer" });
     });
     // report a product
     app.post("/reports", async (req, res) => {
       const newReport = req?.body;
       const result = await reportedItemsCollection.insertOne(newReport);
       res.send(result);
+      // get reported items
+      app.get("/reports", async (req, res) => {
+        const query = {};
+        const cursor = reportedItemsCollection.find(query);
+        const reportedItems = await cursor.toArray();
+        res.send(reportedItems);
+      });
+    });
+    // delete a reported item
+    app.delete("/reports/:id", verifyJwt, async (req, res) => {
+      const id = req?.params?.id;
+      const query = { _id: ObjectId(id) };
+      const deletedReport = await reportedItemsCollection.deleteOne(query);
+
+      res.send(deletedReport);
     });
   } finally {
   }
