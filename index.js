@@ -46,27 +46,6 @@ async function run() {
       .db("ResaleZone")
       .collection("reports");
 
-    // generate jwt and save users email
-    // app.put("/user/:email", async (req, res) => {
-    //   const email = req?.params.email;
-    //   const filter = { email: email };
-    //   const user = req.body;
-    //   const options = { upsert: true };
-    //   const updateDoc = {
-    //     $set: user,
-    //   };
-    //   const result = await usersCollection.updateOne(
-    //     filter,
-    //     updateDoc,
-    //     options
-    //   );
-    //   console.log(result);
-    //   const token = jwt.sign(user, process.env.ACCESS_TOKEN, {
-    //     expiresIn: "1d",
-    //   });
-    //   console.log(token);
-    //   res.send({ result, token });
-    // });
     app.get("/verify", async (req, res) => {
       const email = req.query.email;
       const query = { email: email };
@@ -115,6 +94,12 @@ async function run() {
       const result = await bookingsCollection.insertOne(newBooking);
       res.send(result);
     });
+    // add product
+    app.post("/products", async (req, res) => {
+      const newProductData = req?.body;
+      const newProduct = await productsCollection.insertOne(newProductData);
+      res.send(newProduct);
+    });
 
     // display my bookings / orders
     app.get("/bookings", verifyJwt, async (req, res) => {
@@ -128,6 +113,19 @@ async function run() {
       const myBookings = await bookingsCollection.find(query).toArray();
       console.log(myBookings);
       res.send(myBookings);
+    });
+
+    // display my products
+    app.get("/products", verifyJwt, async (req, res) => {
+      const email = req.query.email;
+      const decodedEmail = req.decoded.email;
+
+      if (email !== decodedEmail) {
+        return res.status(403).send({ message: "forbidden access" });
+      }
+      const query = { email: email };
+      const myProducts = await productsCollection.find(query).toArray();
+      res.send(myProducts);
     });
 
     //
