@@ -140,7 +140,13 @@ async function run() {
       const article = await articlesCollection.findOne(query);
       res.send(article);
     });
-
+    // get reported items
+    app.get("/reports", async (req, res) => {
+      const query = {};
+      const cursor = reportedItemsCollection.find(query);
+      const reportedItems = await cursor.toArray();
+      res.send(reportedItems);
+    });
     // report a product
     app.post("/reports", async (req, res) => {
       const newReport = req?.body;
